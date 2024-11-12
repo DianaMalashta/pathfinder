@@ -10,12 +10,13 @@ typedef struct{
     int island_count;
 } Graph;
 
-typedef struct{
-    int distance;
-    int *predecessor;
-    int preddecessor_count;
-    bool visited;
+typedef struct {
+    int distance;         
+    int *predecessors;    
+    int pred_count;       
+    bool visited;         
 } Island_info;
+
 
 Graph *read_graph_from_file(const char *filename);
 Graph *create_graph(int island_count);
@@ -24,7 +25,7 @@ void free_graph(Graph *graph);
 int add_island(Graph *graph, const char *name);
 void add_bridge(Graph *graph, const char *island1, const char *island2, int length);
 void dijkstra(Graph *graph, int start, Island_info *info);
-void print_path(Graph *graph, Island_info *info, int start, int end);
+void print_all_paths(Graph *graph, Island_info *info, int start, int end, int *path, int path_len);
 
 //errors
 
