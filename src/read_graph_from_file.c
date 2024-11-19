@@ -7,8 +7,13 @@ Graph *read_graph_from_file(const char *filename){
         free(file);
         print_file_error(filename, "error: file ", " is empty\n");
     }
-    char **lines = mx_strsplit(file, '\n');
+    int index = 0;
+    char **lines = check_split_with_index(file, '\n', &index);
     free(file);
+    if(!lines){
+        free_graph_parts(NULL, NULL, NULL, lines);
+        print_line_error(index + 1);
+    }
     if(!lines[0]){
         lines++;
         mx_del_strarr(&lines);
@@ -30,12 +35,20 @@ Graph *read_graph_from_file(const char *filename){
 
     for(int i = 1; lines[i]; i++){
         char **islands = mx_strsplit(lines[i], '-');
+        if(!islands){
+            free_graph_parts(graph, islands, NULL, lines);
+            print_line_error(i + 1);
+        }
         if(!islands[0] || !islands[1]){
             free_graph_parts(graph, islands, NULL, lines);
             print_line_error(i + 1);
         }
         char *island1 = islands[0];
         char **sub_parts = mx_strsplit(islands[1], ',');
+        if(!sub_parts){
+            free_graph_parts(graph, islands, NULL, lines);
+            print_line_error(i + 1);
+        }
         if(!sub_parts[0] || !sub_parts[1]){
             free_graph_parts(graph, islands, sub_parts, lines);
             print_line_error(i + 1);
@@ -60,6 +73,14 @@ Graph *read_graph_from_file(const char *filename){
         actual_lenght += bridge_len;
         int i1 = add_island(graph, island1);
         int i2 = add_island(graph, island2);
+        if(i1 == -1 || i2 == -1){
+            free_graph_parts(graph, islands, sub_parts, lines);
+            mx_print_error("error: invalid number of islands\n");
+        }
+        if(mx_strcmp(island1, island2) == 0){
+            free_graph_parts(graph, islands, sub_parts, lines);
+            print_line_error(i + 1);
+        }
         if(graph->matrix[i1][i2] != INT_MAX){
             free_graph_parts(graph, islands, sub_parts, lines);
             mx_print_error("error: duplicate bridges\n");

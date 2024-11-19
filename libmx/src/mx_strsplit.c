@@ -8,11 +8,19 @@ char **mx_strsplit(const char *s, char c){
 	if(!result) return NULL;
 
 	int i = 0;
+	bool delim_already = false;
 	while(*s){
 		while(*s == c){
+			if(delim_already){
+                for(int j = 0; j < i; j++) free(result[j]);
+                free(result);
+				return NULL;
+			}
+			delim_already = true;
 			s++;
 		}
 		if(*s) {
+			delim_already = false;
 			const char *start = s;
 			int len = 0;
 			while(*s && *s != c){
